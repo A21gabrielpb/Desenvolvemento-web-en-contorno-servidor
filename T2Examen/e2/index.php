@@ -18,8 +18,10 @@
     <h2>Notas Guardadas</h2>
     <ul>
         <?php
-        
+
         // Mostrar las notas guardadas en forma de lista
+        
+
         ?>
     </ul>
 </body>
