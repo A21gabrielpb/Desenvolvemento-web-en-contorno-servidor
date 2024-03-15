@@ -26,6 +26,8 @@ class Animal implements Mascota{
 
     public function obtenerNombre(){}
 
-     public function emitirSonido(){}
+    public function emitirSonido(){}
+
+     
     
 }

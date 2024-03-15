@@ -32,20 +32,20 @@ public function dibujar(){
     
     // Método abstracto para agrandar la figura
   public function agrandar($factor){
-    $anchoagrandado = $factor * $this->ancho;
-    $altoagrandado = $factor * $this->alto;
+    $this->ancho = $factor * $this->ancho;
+    $this->alto = $factor * $this->alto;
     echo"Los nuevos datos encogidios son: \n";
-    echo"Un ancho de " . $anchoagrandado . "\n";
-    echo"Un alto de " . $altoagrandado . "\n";
+    echo"Un ancho de " . $this->ancho . "\n";
+    echo"Un alto de " . $this->alto . "\n";
  }
     
     // Método abstracto para encoger la figura
  public function encoger($factor){
-    $altoencogido =  $this->alto / $factor;
-    $anchoencogido =  $this->ancho / $factor;
+    $this->alto  =  $this->alto / $factor;
+    $this->ancho =  $this->ancho / $factor;
     echo"Los nuevos datos encogidios son: \n";
-    echo"Un ancho de " . $anchoencogido . "\n";
-    echo"Un alto de " . $altoencogido . "\n"; 
+    echo"Un ancho de " . $this->ancho . "\n";
+    echo"Un alto de " . $this->alto  . "\n"; 
 }
 
 }
