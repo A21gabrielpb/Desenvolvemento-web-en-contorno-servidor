@@ -1,0 +1,148 @@
+# app.py
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+# Configuración inicial de Flask y conexión a la base de datos
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@localhost/classicmodels'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Definición del modelo Customer
+class Customer(db.Model):
+    __tablename__ = 'customers'
+    customerNumber = db.Column(db.Integer, primary_key=True)
+    customerName = db.Column(db.String(50))
+    contactLastName = db.Column(db.String(50))
+    contactFirstName = db.Column(db.String(50))
+    phone = db.Column(db.String(50))
+    # Otros campos...
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+# Ruta GET para obtener todos los clientes
+@app.route('/customers', methods=['GET'])
+def get_customers():
+    customers = Customer.query.all()
+    return jsonify([customer.to_dict() for customer in customers])
+
+# Ruta GET para obtener un cliente específico por su ID
+@app.route('/customers/<int:id>', methods=['GET'])
+def get_customer(id):
+    customer = Customer.query.get_or_404(id)
+    return jsonify(customer.to_dict())
+
+# Ruta POST para agregar un nuevo cliente
+@app.route('/customers', methods=['POST'])
+def add_customer():
+    data = request.get_json()
+    new_customer = Customer(**data)
+    db.session.add(new_customer)
+    db.session.commit()
+    return jsonify(new_customer.to_dict()), 201
+
+# Ruta DELETE para eliminar un cliente por su ID
+@app.route('/customers/<int:id>', methods=['DELETE'])
+def delete_customer(id):
+    customer = Customer.query.get_or_404(id)
+    db.session.delete(customer)
+    db.session.commit()
+    return '', 204
+
+# Ruta PUT para actualizar el teléfono de un cliente
+@app.route('/customers/<int:id>', methods=['PUT'])
+def update_customer(id):
+    customer = Customer.query.get_or_404(id)
+    data = request.get_json()
+    if 'phone' in data:
+        customer.phone = data['phone']
+    db.session.commit()
+    return jsonify(customer.to_dict())
+
+# Iniciar la aplicación
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+---------------------------------------------------------------
+
+
+
+// src/Controller/PetController.php
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+
+class PetController extends AbstractController
+{
+    #[Route('/pets', name: 'pets')]
+    public function pets(): Response
+    {
+        // Leer los datos del archivo pets.json
+        $data = json_decode(file_get_contents(__DIR__.'/../../public/pets.json'), true);
+        return $this->render('pets.html.twig', ['pets' => $data]);
+    }
+
+    #[Route('/petscache', name: 'pets_cache')]
+    public function petsCache(CacheInterface $cache): Response
+    {
+        // Usar el sistema de caché para obtener los datos
+        $data = $cache->get('pets_data', function (ItemInterface $item) {
+            $item->expiresAfter(2); // Caché con caducidad de 2 segundos
+            return json_decode(file_get_contents(__DIR__.'/../../public/pets.json'), true);
+        });
+
+        return $this->render('pets.html.twig', ['pets' => $data]);
+    }
+}
+
+---------------------------------------------------------------------------
+{# templates/pets.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pets</title>
+</head>
+<body>
+    <h1>Pets</h1>
+    <ul>
+        {% for pet in pets %}
+            <li>
+                <h2>{{ pet.name }}</h2>
+                <img src="{{ asset(pet.image) }}" alt="{{ pet.name }}">
+                <p>{{ pet.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+------------------------------------------------------------------------
+
+3. Instalar los bundles necesarios en Symfony
+Ejecuta los siguientes comandos para instalar Twig y el sistema de caché en tu proyecto Symfony.
+
+
+composer require twig
+composer require symfony/cache
+4. Configurar la base de datos en .env
+Asegúrate de configurar la base de datos en el archivo .env de tu proyecto Symfony:
+
+
+Copiar código
+DATABASE_URL="mysql://username:password@localhost/classicmodels"
+5. Iniciar el servidor de Symfony
+Ejecuta el siguiente comando para iniciar el servidor de desarrollo de Symfony:
+
+
+Copiar código
+symfony server:start
+Ahora, podrás acceder a las siguientes rutas en tu navegador:
+
+http://localhost:8000/pets para ver la lista de mascotas.
+http://localhost:8000/petscache para ver la lista de mascotas con caché.
